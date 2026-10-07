@@ -1,0 +1,23 @@
+## Ignore build results
+bin/
+obj/
+out/
+
+## .NET
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+_TestResults/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Publish output
+**/Properties/PublishProfiles/
+
+## OS
+.DS_Store
+Thumbs.db
