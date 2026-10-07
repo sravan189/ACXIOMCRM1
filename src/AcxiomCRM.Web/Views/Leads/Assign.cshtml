@@ -1,0 +1,36 @@
+@using AcxiomCRM.Web.Services
+@{
+    ViewData["Title"] = "Assign Lead";
+    var lead = (Lead)ViewBag.Lead;
+    var users = (List<ApplicationUser>)ViewBag.Users;
+}
+
+<h1 class="h3 mb-3">Assign Lead</h1>
+
+<partial name="_Alerts" />
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">@lead.LeadName <small class="text-muted"><code>@lead.LeadCode</code></small></h5>
+        <p class="mb-1"><strong>Company:</strong> @(lead.CompanyName ?? "—")</p>
+        <p class="mb-1"><strong>Status:</strong> <span class="badge bg-secondary">@lead.Status</span></p>
+        <p class="mb-0"><strong>Currently assigned to:</strong> @(lead.AssignedTo?.FullName ?? "Unassigned")</p>
+    </div>
+</div>
+
+<form asp-action="Assign" asp-route-id="@lead.LeadId" method="post" class="row g-2 align-items-end">
+    <div class="col-md-6">
+        <label for="assignToUserId" class="form-label">Assign to (Sales Executives &amp; Managers)</label>
+        <select name="assignToUserId" id="assignToUserId" class="form-select">
+            <option value="">— Select user —</option>
+            @foreach (var u in users)
+            {
+                <option value="@u.Id" selected="@(lead.AssignedToId == u.Id ? "selected" : null)">@u.FullName (@u.Email)</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-6">
+        <button type="submit" class="btn btn-primary">Assign</button>
+        <a asp-action="Details" asp-route-id="@lead.LeadId" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>

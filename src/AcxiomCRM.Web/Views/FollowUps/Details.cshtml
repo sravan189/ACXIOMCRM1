@@ -1,0 +1,95 @@
+@model AcxiomCRM.Web.Models.FollowUp
+@using AcxiomCRM.Web.Models
+@{
+    ViewData["Title"] = "Follow-up details";
+}
+
+@functions {
+    string StatusBadge(FollowUpStatus s) => s switch
+    {
+        FollowUpStatus.Planned => "primary",
+        FollowUpStatus.Completed => "success",
+        FollowUpStatus.Missed => "warning",
+        FollowUpStatus.Cancelled => "secondary",
+        _ => "secondary"
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Follow-up <span class="text-muted fs-5">#@Model.FollowUpId</span></h2>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.FollowUpId" class="btn btn-outline-primary">Edit</a>
+        <a asp-action="Delete" asp-route-id="@Model.FollowUpId" class="btn btn-outline-danger"
+           data-confirm="Delete this follow-up?">Delete</a>
+        <a asp-action="Index" class="btn btn-link">Back to list</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Follow-up Date</dt>
+                    <dd class="col-sm-8">
+                        @Model.FollowUpDate.ToString("dd MMM yyyy")
+                        @if (Model.IsOverdue)
+                        {
+                            <span class="badge bg-danger ms-1">Overdue</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Type</dt>
+                    <dd class="col-sm-8">@Model.FollowUpType</dd>
+
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8"><span class="badge bg-@StatusBadge(Model.Status)">@Model.Status</span></dd>
+
+                    <dt class="col-sm-4">Customer</dt>
+                    <dd class="col-sm-8">@(Model.Customer?.CompanyName ?? Model.Customer?.CustomerName ?? "-")</dd>
+
+                    <dt class="col-sm-4">Lead</dt>
+                    <dd class="col-sm-8">@(Model.Lead?.CompanyName ?? Model.Lead?.LeadName ?? "-")</dd>
+
+                    <dt class="col-sm-4">Remarks</dt>
+                    <dd class="col-sm-8">@(Model.Remarks ?? "-")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Actions</div>
+            <div class="card-body">
+                @if (Model.Status == FollowUpStatus.Planned || Model.Status == FollowUpStatus.Missed)
+                {
+                    <form asp-action="Complete" asp-route-id="@Model.FollowUpId" method="post" class="d-grid mb-3">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check2-circle me-1"></i>Mark Completed
+                        </button>
+                    </form>
+
+                    <form asp-action="Reschedule" asp-route-id="@Model.FollowUpId" method="post">
+                        <label for="newDate" class="form-label">Reschedule to</label>
+                        <div class="input-group mb-2">
+                            <input type="date" id="newDate" name="newDate" class="form-control"
+                                   min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                                   value="@Model.FollowUpDate.ToString("yyyy-MM-dd")" required />
+                            <button type="submit" class="btn btn-outline-warning">Reschedule</button>
+                        </div>
+                    </form>
+
+                    <form asp-action="Cancel" asp-route-id="@Model.FollowUpId" method="post" class="d-grid mt-2">
+                        <button type="submit" class="btn btn-outline-secondary" data-confirm="Cancel this follow-up?">
+                            Cancel Follow-up
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">This follow-up is @Model.Status.ToString().ToLower().</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

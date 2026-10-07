@@ -1,0 +1,97 @@
+@using AcxiomCRM.Web.Services
+@model ConversionReportResult
+@{
+    ViewData["Title"] = "Conversion Report";
+    var f = (ConversionReportFilters)(ViewBag.Filters ?? new ConversionReportFilters());
+    string D(DateTime? d) => d?.ToString("yyyy-MM-dd") ?? "";
+    string groupLabel = f.GroupBy == ConversionGroupBy.Assignee ? "Assignee" : "Month";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Conversion Report</h1>
+    <a asp-action="Conversion" asp-route-groupBy="@f.GroupBy" asp-route-from="@D(f.From)" asp-route-to="@D(f.To)" asp-route-format="csv"
+       class="btn btn-outline-success btn-sm"><i class="bi bi-download"></i> Export CSV</a>
+</div>
+
+<partial name="_Alerts" />
+
+<form method="get" asp-action="Conversion" class="row g-2 mb-3">
+    <div class="col-md-2">
+        <select name="groupBy" class="form-select">
+            @foreach (var g in Enum.GetValues<ConversionGroupBy>())
+            {
+                <option value="@g" selected="@(f.GroupBy == g ? "selected" : null)">By @g</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <input type="date" name="from" value="@D(f.From)" class="form-control" title="From (created)" />
+    </div>
+    <div class="col-md-2">
+        <input type="date" name="to" value="@D(f.To)" class="form-control" title="To (created)" />
+    </div>
+    <div class="col-md-4">
+        <button type="submit" class="btn btn-outline-primary">Filter</button>
+        <a asp-action="Conversion" class="btn btn-outline-secondary">Clear</a>
+    </div>
+</form>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card"><div class="card-body">
+            <div class="text-muted small">Total Leads</div>
+            <div class="h4 mb-0">@Model.Total</div>
+        </div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card"><div class="card-body">
+            <div class="text-muted small">Converted</div>
+            <div class="h4 mb-0">@Model.Converted</div>
+        </div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card"><div class="card-body">
+            <div class="text-muted small">Overall Conversion Rate</div>
+            <div class="h4 mb-0">@Model.OverallRate.ToString("0.0")%</div>
+        </div></div>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>@groupLabel</th>
+                <th class="text-end">Total Leads</th>
+                <th class="text-end">Converted</th>
+                <th class="text-end">Lost</th>
+                <th class="text-end">Conversion %</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Rows.Any())
+            {
+                <tr><td colspan="5" class="text-center text-muted py-4">No leads match the current filters.</td></tr>
+            }
+            @foreach (var r in Model.Rows)
+            {
+                <tr>
+                    <td>@r.GroupLabel</td>
+                    <td class="text-end">@r.Total</td>
+                    <td class="text-end">@r.Converted</td>
+                    <td class="text-end">@r.Lost</td>
+                    <td class="text-end">@r.ConversionRate.ToString("0.0")%</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot class="table-light">
+            <tr>
+                <th>Total</th>
+                <th class="text-end">@Model.Total</th>
+                <th class="text-end">@Model.Converted</th>
+                <th class="text-end">@Model.Rows.Sum(r => r.Lost)</th>
+                <th class="text-end">@Model.OverallRate.ToString("0.0")%</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>

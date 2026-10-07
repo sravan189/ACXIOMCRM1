@@ -1,0 +1,74 @@
+@model IReadOnlyList<AcxiomCRM.Web.Services.OpportunityPipelineStage>
+@using AcxiomCRM.Web.Models
+@{
+    ViewData["Title"] = "Sales Pipeline";
+    var grandTotal = Model.Sum(s => s.TotalAmount);
+    var grandWeighted = Model.Sum(s => s.WeightedSum);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Sales Pipeline</h2>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i>New Opportunity
+    </a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card text-bg-primary">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-1 text-white-50">Total pipeline value</h6>
+                <h3 class="card-title mb-0">&#8377;@grandTotal.ToString("N2")</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card text-bg-success">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-1 text-white-50">Weighted pipeline value</h6>
+                <h3 class="card-title mb-0">&#8377;@grandWeighted.ToString("N2")</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex gap-3 overflow-auto pb-3">
+    @foreach (var column in Model)
+    {
+        <div class="card flex-shrink-0" style="width: 300px;">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <strong>@column.Stage</strong>
+                    <span class="badge bg-secondary">@column.Count</span>
+                </div>
+                <div class="small text-muted mt-1">
+                    Total: &#8377;@column.TotalAmount.ToString("N2")<br />
+                    Weighted: &#8377;@column.WeightedSum.ToString("N2")
+                </div>
+            </div>
+            <div class="card-body">
+                @if (!column.Opportunities.Any())
+                {
+                    <p class="text-muted small mb-0">No opportunities.</p>
+                }
+                @foreach (var o in column.Opportunities)
+                {
+                    <div class="card mb-2 shadow-sm">
+                        <div class="card-body py-2 px-3">
+                            <a asp-action="Details" asp-route-id="@o.OpportunityId" class="fw-semibold text-decoration-none">
+                                @o.OpportunityName
+                            </a>
+                            <div class="small text-muted">@(o.Customer?.CompanyName ?? o.Customer?.CustomerName ?? "-")</div>
+                            <div class="d-flex justify-content-between mt-2 small">
+                                <span class="fw-bold">&#8377;@o.Amount.ToString("N2")</span>
+                                <span>@o.Probability%</span>
+                            </div>
+                            <div class="small text-muted">Weighted: &#8377;@o.WeightedAmount.ToString("N2")</div>
+                            <div class="small text-muted">Closes @o.ExpectedCloseDate.ToString("dd MMM yyyy")</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

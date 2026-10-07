@@ -1,0 +1,20 @@
+@model AcxiomCRM.Web.Models.FollowUp
+@{
+    ViewData["Title"] = "Delete Follow-up";
+}
+
+<h2>Delete Follow-up</h2>
+<hr />
+
+<div class="alert alert-warning" role="alert">
+    Are you sure you want to delete the
+    <strong>@Model.FollowUpType</strong> follow-up scheduled for
+    <strong>@Model.FollowUpDate.ToString("dd MMM yyyy")</strong>?
+    This cannot be undone.
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" name="id" value="@Model.FollowUpId" />
+    <button type="submit" class="btn btn-danger" data-confirm="Permanently delete this follow-up?">Delete</button>
+    <a asp-action="Details" asp-route-id="@Model.FollowUpId" class="btn btn-link">Cancel</a>
+</form>

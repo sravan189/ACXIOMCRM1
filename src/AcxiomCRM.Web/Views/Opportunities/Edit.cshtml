@@ -1,0 +1,99 @@
+@model AcxiomCRM.Web.ViewModels.Opportunities.OpportunityFormViewModel
+@using AcxiomCRM.Web.Models
+@{
+    ViewData["Title"] = "Edit Opportunity";
+}
+
+<h2>Edit Opportunity</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="OpportunityId" />
+            <input type="hidden" asp-for="Stage" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label class="form-label">Stage</label>
+                <div><span class="badge bg-secondary">@Model.Stage</span>
+                    <span class="text-muted small ms-2">Stage changes go through the Pipeline actions.</span></div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="OpportunityName" class="form-label"></label>
+                <input asp-for="OpportunityName" class="form-control" />
+                <span asp-validation-for="OpportunityName" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="CustomerId" class="form-label"></label>
+                    <select asp-for="CustomerId" asp-items="Model.CustomerOptions" class="form-select">
+                        <option value="">-- None --</option>
+                    </select>
+                    <span asp-validation-for="CustomerId" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="LeadId" class="form-label"></label>
+                    <select asp-for="LeadId" asp-items="Model.LeadOptions" class="form-select">
+                        <option value="">-- None --</option>
+                    </select>
+                    <span asp-validation-for="LeadId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Amount" class="form-label"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">&#8377;</span>
+                        <input asp-for="Amount" class="form-control" />
+                    </div>
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Probability" class="form-label"></label>
+                    <div class="input-group">
+                        <input asp-for="Probability" class="form-control" />
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <span asp-validation-for="Probability" class="text-danger"></span>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label asp-for="ExpectedCloseDate" class="form-label"></label>
+                    <input asp-for="ExpectedCloseDate" type="date" class="form-control" />
+                    <span asp-validation-for="ExpectedCloseDate" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Source" class="form-label"></label>
+                    <input asp-for="Source" class="form-control" />
+                    <span asp-validation-for="Source" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="AssignedToId" class="form-label"></label>
+                    <select asp-for="AssignedToId" asp-items="Model.AssigneeOptions" class="form-select">
+                        <option value="">-- Unassigned --</option>
+                    </select>
+                    <span asp-validation-for="AssignedToId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Notes" class="form-label"></label>
+                <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-action="Details" asp-route-id="@Model.OpportunityId" class="btn btn-link">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

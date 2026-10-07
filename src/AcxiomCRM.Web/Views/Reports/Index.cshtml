@@ -1,0 +1,90 @@
+@using AcxiomCRM.Web.Models
+@{
+    ViewData["Title"] = "Reports";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Reports</h1>
+</div>
+
+<partial name="_Alerts" />
+
+<p class="text-muted">Pick a report. Every report respects your record visibility: Managers and Admins see everything, Sales Executives see only records they own or are assigned to.</p>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-people"></i> Customer Report</h5>
+                <p class="card-text text-muted small">Customer list with status, owner and creation date.</p>
+                <a asp-action="Customers" class="btn btn-outline-primary btn-sm">Open report</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-funnel"></i> Lead Report</h5>
+                <p class="card-text text-muted small">Lead source, status, owner and expected value.</p>
+                <a asp-action="Leads" class="btn btn-outline-primary btn-sm">Open report</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-calendar-check"></i> Follow-Up Report</h5>
+                <p class="card-text text-muted small">Planned, upcoming, overdue, completed and missed follow-ups.</p>
+                <a asp-action="FollowUps" class="btn btn-outline-primary btn-sm">Open report</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-briefcase"></i> Opportunity Report</h5>
+                <p class="card-text text-muted small">Stage, amount, probability and expected close date.</p>
+                <a asp-action="Opportunities" class="btn btn-outline-primary btn-sm">Open report</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-kanban"></i> Pipeline Report</h5>
+                <p class="card-text text-muted small">Stage-wise and owner-wise pipeline amounts, weighted by probability.</p>
+                <a asp-action="Pipeline" class="btn btn-outline-primary btn-sm">Open report</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-graph-up-arrow"></i> Conversion Report</h5>
+                <p class="card-text text-muted small">Lead conversion rate: converted vs total, by month or by assignee.</p>
+                <a asp-action="Conversion" class="btn btn-outline-primary btn-sm">Open report</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-person-lines-fill"></i> User Activity Report</h5>
+                <p class="card-text text-muted small">Logins and CRUD actions per user, from the audit trail.</p>
+                <a asp-action="UserActivity" class="btn btn-outline-primary btn-sm">Open report</a>
+            </div>
+        </div>
+    </div>
+    @if (User.IsInRole(RoleNames.Admin))
+    {
+        <div class="col-md-4">
+            <div class="card h-100 border-warning">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-shield-lock"></i> Audit Log <span class="badge bg-warning text-dark">Admin</span></h5>
+                    <p class="card-text text-muted small">Security and business audit events, newest first. Read-only.</p>
+                    <a asp-action="AuditLogs" class="btn btn-outline-primary btn-sm">Open report</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

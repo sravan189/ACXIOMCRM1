@@ -1,0 +1,97 @@
+@using AcxiomCRM.Web.Models
+@using AcxiomCRM.Web.Services
+@using AcxiomCRM.Web.ViewModels.Shared
+@model PagedResult<FollowUpReportRow>
+@{
+    ViewData["Title"] = "Follow-Up Report";
+    var f = (FollowUpReportFilters)(ViewBag.Filters ?? new FollowUpReportFilters());
+    var sortBy = f.SortBy ?? "date";
+    var sortDir = f.SortDir ?? "asc";
+    string ToggleDir(string col) => sortBy == col && sortDir == "asc" ? "desc" : "asc";
+    string Arrow(string col) => sortBy == col ? (sortDir == "asc" ? " ▲" : " ▼") : "";
+    string D(DateTime? d) => d?.ToString("yyyy-MM-dd") ?? "";
+    Dictionary<string, string?> Route(string? sb, string? sd) => new()
+    {
+        ["bucket"] = ((int)f.Bucket).ToString(),
+        ["from"] = D(f.From), ["to"] = D(f.To),
+        ["sortBy"] = sb, ["sortDir"] = sd
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Follow-Up Report</h1>
+    <a asp-action="FollowUps" asp-all-route-data="@(Route(sortBy, sortDir))" asp-route-format="csv"
+       class="btn btn-outline-success btn-sm"><i class="bi bi-download"></i> Export CSV</a>
+</div>
+
+<partial name="_Alerts" />
+
+<form method="get" asp-action="FollowUps" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <select name="bucket" class="form-select">
+            @foreach (var b in Enum.GetValues<FollowUpBucket>())
+            {
+                <option value="@((int)b)" selected="@(f.Bucket == b ? "selected" : null)">@b</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <input type="date" name="from" value="@D(f.From)" class="form-control" title="From (created)" />
+    </div>
+    <div class="col-md-2">
+        <input type="date" name="to" value="@D(f.To)" class="form-control" title="To (created)" />
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-outline-primary">Filter</button>
+        <a asp-action="FollowUps" class="btn btn-outline-secondary">Clear</a>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th><a asp-action="FollowUps" asp-all-route-data="@(Route("date", ToggleDir("date")))" class="text-decoration-none">Follow-Up Date@(Arrow("date"))</a></th>
+                <th><a asp-action="FollowUps" asp-all-route-data="@(Route("type", ToggleDir("type")))" class="text-decoration-none">Type@(Arrow("type"))</a></th>
+                <th><a asp-action="FollowUps" asp-all-route-data="@(Route("related", ToggleDir("related")))" class="text-decoration-none">Related To@(Arrow("related"))</a></th>
+                <th><a asp-action="FollowUps" asp-all-route-data="@(Route("status", ToggleDir("status")))" class="text-decoration-none">Status@(Arrow("status"))</a></th>
+                <th>Remarks</th>
+                <th>Assigned To</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Items.Any())
+            {
+                <tr><td colspan="6" class="text-center text-muted py-4">No follow-ups match the current filters.</td></tr>
+            }
+            @foreach (var fu in Model.Items)
+            {
+                <tr class="@(fu.IsOverdue ? "table-danger" : "")">
+                    <td class="text-nowrap">@fu.FollowUpDate.ToString("dd MMM yyyy, hh:mm tt")</td>
+                    <td>@fu.FollowUpType</td>
+                    <td>@fu.RelatedTo <span class="text-muted small">(@fu.RelatedType)</span></td>
+                    <td>
+                        <span class="badge bg-secondary">@fu.Status</span>
+                        @if (fu.IsOverdue)
+                        {
+                            <span class="badge bg-danger">Overdue</span>
+                        }
+                    </td>
+                    <td class="text-truncate" style="max-width: 260px;" title="@fu.Remarks">@(fu.Remarks ?? "-")</td>
+                    <td>@(fu.AssignedToName ?? "-")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@await Html.PartialAsync("_Pagination", new PaginationViewModel
+{
+    PageIndex = Model.Page,
+    TotalPages = Model.TotalPages,
+    TotalCount = Model.TotalCount,
+    PageSize = Model.PageSize,
+    Action = "FollowUps",
+    Controller = "Reports",
+    RouteValues = Route(sortBy, sortDir)
+})

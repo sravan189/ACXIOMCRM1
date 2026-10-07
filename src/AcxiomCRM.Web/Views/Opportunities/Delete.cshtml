@@ -1,0 +1,20 @@
+@model AcxiomCRM.Web.Models.Opportunity
+@{
+    ViewData["Title"] = "Delete Opportunity";
+}
+
+<h2>Delete Opportunity</h2>
+<hr />
+
+<div class="alert alert-warning" role="alert">
+    Are you sure you want to delete the opportunity
+    <strong>@Model.OpportunityName</strong>
+    (&#8377;@Model.Amount.ToString("N2"), @Model.Stage)?
+    This cannot be undone.
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" name="id" value="@Model.OpportunityId" />
+    <button type="submit" class="btn btn-danger" data-confirm="Permanently delete this opportunity?">Delete</button>
+    <a asp-action="Details" asp-route-id="@Model.OpportunityId" class="btn btn-link">Cancel</a>
+</form>

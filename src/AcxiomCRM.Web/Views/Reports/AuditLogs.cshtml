@@ -1,0 +1,112 @@
+@using AcxiomCRM.Web.Models
+@using AcxiomCRM.Web.Services
+@using AcxiomCRM.Web.ViewModels.Shared
+@model PagedResult<AuditLogRow>
+@{
+    ViewData["Title"] = "Audit Log";
+    var f = (AuditLogFilters)(ViewBag.Filters ?? new AuditLogFilters());
+    var entityNames = (IReadOnlyList<string>)(ViewBag.EntityNames ?? Array.Empty<string>());
+    var actions = (IReadOnlyList<string>)(ViewBag.Actions ?? Array.Empty<string>());
+    var filterUsers = (List<ApplicationUser>?)(ViewBag.FilterUsers);
+    string D(DateTime? d) => d?.ToString("yyyy-MM-dd") ?? "";
+    Dictionary<string, string?> Route() => new()
+    {
+        ["entityName"] = f.EntityName, ["action"] = f.Action, ["userId"] = f.UserId,
+        ["from"] = D(f.From), ["to"] = D(f.To)
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Audit Log <span class="badge bg-warning text-dark">Admin</span></h1>
+    <a asp-action="AuditLogs" asp-all-route-data="@(Route())" asp-route-format="csv"
+       class="btn btn-outline-success btn-sm"><i class="bi bi-download"></i> Export CSV</a>
+</div>
+
+<partial name="_Alerts" />
+<p class="text-muted small">Read-only. Newest first. The audit trail is append-only — no entry can be edited or deleted.</p>
+
+<form method="get" asp-action="AuditLogs" class="row g-2 mb-3">
+    <div class="col-md-2">
+        <select name="entityName" class="form-select">
+            <option value="">All entities</option>
+            @foreach (var e in entityNames)
+            {
+                <option value="@e" selected="@(f.EntityName == e ? "selected" : null)">@e</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="action" class="form-select">
+            <option value="">All actions</option>
+            @foreach (var a in actions)
+            {
+                <option value="@a" selected="@(f.Action == a ? "selected" : null)">@a</option>
+            }
+        </select>
+    </div>
+    @if (filterUsers is not null)
+    {
+        <div class="col-md-2">
+            <select name="userId" class="form-select">
+                <option value="">All users</option>
+                @foreach (var u in filterUsers)
+                {
+                    <option value="@u.Id" selected="@(f.UserId == u.Id ? "selected" : null)">@u.FullName</option>
+                }
+            </select>
+        </div>
+    }
+    <div class="col-md-2">
+        <input type="date" name="from" value="@D(f.From)" class="form-control" title="From" />
+    </div>
+    <div class="col-md-2">
+        <input type="date" name="to" value="@D(f.To)" class="form-control" title="To" />
+    </div>
+    <div class="col-md-2 d-flex gap-1">
+        <button type="submit" class="btn btn-outline-primary">Filter</button>
+        <a asp-action="AuditLogs" class="btn btn-outline-secondary">Clear</a>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Timestamp</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>Entity</th>
+                <th>Record Id</th>
+                <th>IP</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Items.Any())
+            {
+                <tr><td colspan="6" class="text-center text-muted py-4">No audit entries match the current filters.</td></tr>
+            }
+            @foreach (var a in Model.Items)
+            {
+                <tr>
+                    <td class="text-nowrap">@a.CreatedDate.ToString("dd MMM yyyy, HH:mm:ss")</td>
+                    <td>@(a.UserName ?? "-")</td>
+                    <td><span class="badge bg-secondary">@a.Action</span></td>
+                    <td>@(a.EntityName ?? "-")</td>
+                    <td class="text-nowrap">@(a.RecordId ?? "-")</td>
+                    <td class="text-nowrap">@(a.IpAddress ?? "-")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@await Html.PartialAsync("_Pagination", new PaginationViewModel
+{
+    PageIndex = Model.Page,
+    TotalPages = Model.TotalPages,
+    TotalCount = Model.TotalCount,
+    PageSize = Model.PageSize,
+    Action = "AuditLogs",
+    Controller = "Reports",
+    RouteValues = Route()
+})

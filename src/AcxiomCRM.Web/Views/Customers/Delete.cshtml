@@ -1,0 +1,40 @@
+@model Customer
+@{
+    ViewData["Title"] = "Deactivate Customer";
+}
+
+<h1 class="h3 mb-3">Deactivate Customer</h1>
+
+<partial name="_Alerts" />
+
+<div class="alert alert-warning">
+    Are you sure you want to deactivate <strong>@Model.CustomerName</strong> (<code>@Model.CustomerCode</code>)?
+    The record will be kept and marked <strong>Inactive</strong> — it will not be permanently deleted.
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Customer Name</dt>
+    <dd class="col-sm-9">@Model.CustomerName</dd>
+    <dt class="col-sm-3">Email</dt>
+    <dd class="col-sm-9">@Model.Email</dd>
+    <dt class="col-sm-3">Phone</dt>
+    <dd class="col-sm-9">@Model.Phone</dd>
+    <dt class="col-sm-3">Company</dt>
+    <dd class="col-sm-9">@(Model.CompanyName ?? "—")</dd>
+    <dt class="col-sm-3">Status</dt>
+    <dd class="col-sm-9"><span class="badge @(Model.Status == CustomerStatus.Active ? "bg-success" : "bg-secondary")">@Model.Status</span></dd>
+</dl>
+
+<form asp-action="Delete" method="post" data-confirm="Deactivate this customer? This will mark the customer as Inactive.">
+    <input type="hidden" name="id" value="@Model.CustomerId" />
+    <button type="submit" class="btn btn-danger">Deactivate</button>
+    <a asp-action="Details" asp-route-id="@Model.CustomerId" class="btn btn-secondary">Cancel</a>
+</form>
+
+<script>
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            if (!confirm(form.getAttribute('data-confirm'))) e.preventDefault();
+        });
+    });
+</script>

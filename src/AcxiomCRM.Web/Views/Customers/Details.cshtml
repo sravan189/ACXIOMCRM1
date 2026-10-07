@@ -1,0 +1,142 @@
+@model Customer
+@{
+    ViewData["Title"] = "Customer Details";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">@Model.CustomerName <small class="text-muted fs-6"><code>@Model.CustomerCode</code></small></h1>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.CustomerId" class="btn btn-primary">Edit</a>
+        @if (Model.Status == CustomerStatus.Active)
+        {
+            <a asp-action="Delete" asp-route-id="@Model.CustomerId" class="btn btn-outline-danger">Deactivate</a>
+        }
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>
+
+<partial name="_Alerts" />
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="card-title mb-0">Customer Information</h5>
+            <span class="badge @(Model.Status == CustomerStatus.Active ? "bg-success" : "bg-secondary")">@Model.Status</span>
+        </div>
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">@Model.Email</dd>
+            <dt class="col-sm-3">Phone</dt>
+            <dd class="col-sm-9">@Model.Phone</dd>
+            <dt class="col-sm-3">Company</dt>
+            <dd class="col-sm-9">@(Model.CompanyName ?? "—")</dd>
+            <dt class="col-sm-3">Address</dt>
+            <dd class="col-sm-9">@(Model.Address ?? "—"), @(Model.City ?? "—"), @(Model.State ?? "—")</dd>
+            <dt class="col-sm-3">Created</dt>
+            <dd class="col-sm-9">@Model.CreatedDate.ToString("dd MMM yyyy HH:mm")</dd>
+            @if (Model.ModifiedDate.HasValue)
+            {
+                <dt class="col-sm-3">Modified</dt>
+                <dd class="col-sm-9">@Model.ModifiedDate.Value.ToString("dd MMM yyyy HH:mm")</dd>
+            }
+            <dt class="col-sm-3">Created By</dt>
+            <dd class="col-sm-9">@(Model.CreatedBy?.FullName ?? "—")</dd>
+            <dt class="col-sm-3">Assigned To</dt>
+            <dd class="col-sm-9">@(Model.AssignedTo?.FullName ?? "—")</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0">Opportunities (@Model.Opportunities.Count)</h5></div>
+    <div class="card-body p-0">
+        @if (Model.Opportunities.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped mb-0">
+                    <thead class="table-light">
+                        <tr><th>Name</th><th>Amount</th><th>Stage</th><th>Probability</th><th>Expected Close</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var o in Model.Opportunities.OrderByDescending(o => o.CreatedDate))
+                        {
+                            <tr>
+                                <td>@o.OpportunityName</td>
+                                <td class="text-nowrap">₹@o.Amount.ToString("N2")</td>
+                                <td><span class="badge bg-info text-dark">@o.Stage</span></td>
+                                <td>@o.Probability%</td>
+                                <td class="text-nowrap">@o.ExpectedCloseDate.ToString("dd MMM yyyy")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted p-3 mb-0">No opportunities linked to this customer.</p>
+        }
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0">Follow-ups (@Model.FollowUps.Count)</h5></div>
+    <div class="card-body p-0">
+        @if (Model.FollowUps.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped mb-0">
+                    <thead class="table-light">
+                        <tr><th>Date</th><th>Type</th><th>Remarks</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var f in Model.FollowUps.OrderByDescending(f => f.FollowUpDate))
+                        {
+                            <tr>
+                                <td class="text-nowrap">@f.FollowUpDate.ToString("dd MMM yyyy")</td>
+                                <td>@f.FollowUpType</td>
+                                <td>@(f.Remarks ?? "—")</td>
+                                <td><span class="badge bg-secondary">@f.Status</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted p-3 mb-0">No follow-ups for this customer.</p>
+        }
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0">Activities (@Model.Activities.Count)</h5></div>
+    <div class="card-body p-0">
+        @if (Model.Activities.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped mb-0">
+                    <thead class="table-light">
+                        <tr><th>Date</th><th>Type</th><th>Subject</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var a in Model.Activities.OrderByDescending(a => a.ActivityDate))
+                        {
+                            <tr>
+                                <td class="text-nowrap">@a.ActivityDate.ToString("dd MMM yyyy")</td>
+                                <td>@a.ActivityType</td>
+                                <td>@a.Subject</td>
+                                <td><span class="badge bg-secondary">@a.Status</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted p-3 mb-0">No activities for this customer.</p>
+        }
+    </div>
+</div>

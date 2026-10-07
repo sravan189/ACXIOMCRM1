@@ -1,0 +1,88 @@
+@model AcxiomCRM.Web.Models.Opportunity
+@using AcxiomCRM.Web.Models
+@{
+    ViewData["Title"] = "Opportunity details";
+}
+
+@functions {
+    string StageBadge(OpportunityStage s) => s switch
+    {
+        OpportunityStage.Qualification => "secondary",
+        OpportunityStage.Proposal => "info",
+        OpportunityStage.Negotiation => "warning",
+        OpportunityStage.Won => "success",
+        OpportunityStage.Lost => "danger",
+        _ => "secondary"
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>@Model.OpportunityName</h2>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.OpportunityId" class="btn btn-outline-primary">Edit</a>
+        <a asp-action="Delete" asp-route-id="@Model.OpportunityId" class="btn btn-outline-danger"
+           data-confirm="Delete this opportunity?">Delete</a>
+        <a asp-action="Index" class="btn btn-link">Back to list</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Stage</dt>
+                    <dd class="col-sm-8"><span class="badge bg-@StageBadge(Model.Stage)">@Model.Stage</span></dd>
+
+                    <dt class="col-sm-4">Amount</dt>
+                    <dd class="col-sm-8">&#8377;@Model.Amount.ToString("N2")</dd>
+
+                    <dt class="col-sm-4">Probability</dt>
+                    <dd class="col-sm-8">@Model.Probability%</dd>
+
+                    <dt class="col-sm-4">Weighted Amount</dt>
+                    <dd class="col-sm-8">&#8377;@Model.WeightedAmount.ToString("N2")</dd>
+
+                    <dt class="col-sm-4">Expected Close Date</dt>
+                    <dd class="col-sm-8">@Model.ExpectedCloseDate.ToString("dd MMM yyyy")</dd>
+
+                    <dt class="col-sm-4">Customer</dt>
+                    <dd class="col-sm-8">@(Model.Customer?.CompanyName ?? Model.Customer?.CustomerName ?? "-")</dd>
+
+                    <dt class="col-sm-4">Lead</dt>
+                    <dd class="col-sm-8">@(Model.Lead?.CompanyName ?? Model.Lead?.LeadName ?? "-")</dd>
+
+                    <dt class="col-sm-4">Source</dt>
+                    <dd class="col-sm-8">@(Model.Source ?? "-")</dd>
+
+                    <dt class="col-sm-4">Notes</dt>
+                    <dd class="col-sm-8">@(Model.Notes ?? "-")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Stage actions</div>
+            <div class="card-body">
+                @if (Model.IsOpen)
+                {
+                    <form asp-action="MarkWon" asp-route-id="@Model.OpportunityId" method="post" class="d-grid mb-2">
+                        <button type="submit" class="btn btn-success" data-confirm="Mark this opportunity as Won?">
+                            <i class="bi bi-trophy me-1"></i>Mark Won
+                        </button>
+                    </form>
+                    <form asp-action="MarkLost" asp-route-id="@Model.OpportunityId" method="post" class="d-grid">
+                        <button type="submit" class="btn btn-outline-danger" data-confirm="Mark this opportunity as Lost?">
+                            Mark Lost
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">This deal is closed (@Model.Stage).</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

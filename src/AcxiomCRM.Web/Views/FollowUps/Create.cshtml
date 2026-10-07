@@ -1,0 +1,68 @@
+@model AcxiomCRM.Web.ViewModels.FollowUps.FollowUpFormViewModel
+@using AcxiomCRM.Web.Models
+@{
+    ViewData["Title"] = "Schedule Follow-up";
+}
+
+<h2>Schedule Follow-up</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="FollowUpDate" class="form-label"></label>
+                    <input asp-for="FollowUpDate" type="date" class="form-control"
+                           min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    <span asp-validation-for="FollowUpDate" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="FollowUpType" class="form-label"></label>
+                    <select asp-for="FollowUpType" asp-items="Html.GetEnumSelectList<FollowUpType>()" class="form-select"></select>
+                    <span asp-validation-for="FollowUpType" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="CustomerId" class="form-label"></label>
+                    <select asp-for="CustomerId" asp-items="Model.CustomerOptions" class="form-select">
+                        <option value="">-- None --</option>
+                    </select>
+                    <span asp-validation-for="CustomerId" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="LeadId" class="form-label"></label>
+                    <select asp-for="LeadId" asp-items="Model.LeadOptions" class="form-select">
+                        <option value="">-- None --</option>
+                    </select>
+                    <span asp-validation-for="LeadId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="AssignedToId" class="form-label"></label>
+                <select asp-for="AssignedToId" asp-items="Model.AssigneeOptions" class="form-select">
+                    <option value="">-- Unassigned --</option>
+                </select>
+                <span asp-validation-for="AssignedToId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Remarks" class="form-label"></label>
+                <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Remarks" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Schedule</button>
+            <a asp-action="Index" class="btn btn-link">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

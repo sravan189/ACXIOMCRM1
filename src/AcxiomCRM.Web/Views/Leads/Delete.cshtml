@@ -1,0 +1,42 @@
+@model Lead
+@{
+    ViewData["Title"] = "Delete Lead";
+}
+
+<h1 class="h3 mb-3">Delete Lead</h1>
+
+<partial name="_Alerts" />
+
+<div class="alert alert-danger">
+    Are you sure you want to permanently delete lead <strong>@Model.LeadName</strong> (<code>@Model.LeadCode</code>)?
+    This cannot be undone. If the lead has related follow-ups, activities or opportunities, the delete will be blocked.
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Lead Name</dt>
+    <dd class="col-sm-9">@Model.LeadName</dd>
+    <dt class="col-sm-3">Company</dt>
+    <dd class="col-sm-9">@(Model.CompanyName ?? "—")</dd>
+    <dt class="col-sm-3">Email</dt>
+    <dd class="col-sm-9">@(Model.Email ?? "—")</dd>
+    <dt class="col-sm-3">Phone</dt>
+    <dd class="col-sm-9">@(Model.Phone ?? "—")</dd>
+    <dt class="col-sm-3">Status</dt>
+    <dd class="col-sm-9">@Model.Status</dd>
+    <dt class="col-sm-3">Expected Value</dt>
+    <dd class="col-sm-9">₹@Model.ExpectedValue.ToString("N2")</dd>
+</dl>
+
+<form asp-action="Delete" method="post" data-confirm="Permanently delete this lead? This cannot be undone.">
+    <input type="hidden" name="id" value="@Model.LeadId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Details" asp-route-id="@Model.LeadId" class="btn btn-secondary">Cancel</a>
+</form>
+
+<script>
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            if (!confirm(form.getAttribute('data-confirm'))) e.preventDefault();
+        });
+    });
+</script>
